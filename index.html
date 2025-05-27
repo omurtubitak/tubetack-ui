@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8">
+  <title>Balistika Quiz Admin Paneli</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <!-- Bootstrap CSS -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
+  <style>
+    body {
+      background: linear-gradient(to bottom right, #e0f7fa, #ffffff);
+      min-height: 100vh;
+    }
+    .hero {
+      padding-top: 80px;
+      padding-bottom: 80px;
+      text-align: center;
+    }
+    .logo-img {
+      height: 50px;
+    }
+    .winner-box {
+      background-color: white;
+      border-radius: 20px;
+      padding: 30px;
+      box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+      transition: transform 0.3s ease-in-out;
+    }
+    .winner-box:hover {
+      transform: scale(1.02);
+    }
+    .winner-icon {
+      font-size: 48px;
+      color: #28a745;
+      margin-bottom: 15px;
+    }
+
+  </style>
+</head>
+<body>
+
+  <!-- Navbar -->
+  <nav class="navbar navbar-expand-lg navbar-light bg-white shadow-sm">
+    <div class="container">
+      <a class="navbar-brand" href="#">
+        <img src="https://balistika.com.tr/images/sitelogo.png" alt="Balistika Logo" class="logo-img">
+        
+      </a>
+      <div class="ms-auto">
+        <a href="login.html" class="btn btn-lg btn-outline-danger px-5 py-2">LOGIN</a>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Hero Section -->
+  <section class="hero">
+    <div class="container">
+      <h1 class="display-4 mb-3">We Are in Dublin !</h1>
+      <p class="lead mb-4">Please check out the winner of challenge below: </p> 
+    </div>
+  </section>
+  <div class="container mt-5">
+    <h2 class="text-center mb-4"> Winner is ...</h2>
+    <div id="winnerInfo" class="winner-box text-center">
+      <p><strong>Loadin...</strong></p>
+    </div>
+  </div>
+  <script>
+    const firebaseConfig = {
+      apiKey: "AIzaSyCBM_rIBwuBlm3UkvCd_R5UcBrGzHMd4so",
+      authDomain: "askque-729f3.firebaseapp.com",
+      projectId: "askque-729f3",
+      storageBucket: "askque-729f3.appspot.com",
+      messagingSenderId: "218092354672",
+      appId: "1:218092354672:web:226cb9c767058face1c8b5",
+      measurementId: "G-THZX3Y5C24"
+    };
+
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.firestore();
+
+    const winnerRef = db.collection("balistika-quiz").doc("winner");
+    const winnerInfo = document.getElementById("winnerInfo");
+
+    async function kazananBilgisiniYukle() {
+      try {
+        const doc = await winnerRef.get();
+        if (doc.exists) {
+          const data = doc.data();
+          winnerInfo.innerHTML = `
+            <h4>${data.winnerName}</h4>
+            <p><strong>Reward :</strong> ${data.prize}</p>
+          `;
+        } else {
+          winnerInfo.innerHTML = `<p><em>The winner is not loading yet.</em></p>`;
+        }
+      } catch (error) {
+        winnerInfo.innerHTML = `<p class="text-danger">Error from database. </p>`;
+        console.error("Kazanan verisi alınamadı:", error);
+      }
+    }
+
+    window.onload = kazananBilgisiniYukle;
+  </script>
+  <!-- Bootstrap JS -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+
+</html>
