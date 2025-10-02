@@ -202,7 +202,7 @@
                 <pre id="output"></pre>
                 <div class="d-grid gap-2 d-md-flex justify-content-md-end">
                   <button
-                    onclick="compareFromUrl()"
+                    onclick="compareFromURL()"
                     class="btn btn-primary"
                     id="compareBtn"
                   >
@@ -381,7 +381,7 @@
       });
       const supabaseClient = supabase.createClient(
         'https://wablvevlywlqifnezzdp.supabase.co',
-        'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6IndhYmx2ZXZseXdscWlmbmV6emRwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDg3OTM2ODksImV4cCI6MjA2NDM2OTY4OX0.IUJi55B60PLAlDE5rlLX0xutm7u4UYVR4HGCmWwDxE4'
+        'sb_publishable_yNjEZEoiEAqyb2OrhFQLgw_vpg8Ak2N'
       ); // Supabase client tanımlaması
 
       // DOM elementlerini önbelleğe al
@@ -584,8 +584,8 @@
       }
 
       async function compareFromURL() {
-        const file1 = document.getElementById('file1').files[0];
-        const file2 = document.getElementById('file2').files[0];
+        const URL1 = document.getElementById('url1').value;
+        const URL2 = document.getElementById('url2').value;
 
         if (!file1 || !file2) {
           return alert('Lütfen karşılaştırmak için iki X3P dosyası seçin.');
@@ -596,49 +596,6 @@
         fileUploadCompareBtn.disabled = true;
 
         try {
-          // 3. Signed URL alma (60 saniye geçerli)
-
-          const { data: signed1, error: urlErr1 } = await supabaseClient.storage
-            .from('x3p-files')
-            .createSignedUrl(`input/${file1.name}`, 60);
-
-          const { data: signed2, error: urlErr2 } = await supabaseClient.storage
-            .from('x3p-files')
-            .createSignedUrl(`input/${file2.name}`, 60);
-
-          if (
-            urlErr1 ||
-            urlErr2 ||
-            !signed1?.signedUrl ||
-            !signed2?.signedUrl
-          ) {
-            console.error(urlErr1 || urlErr2);
-            showError(
-              'Signed URL alınamadı. Policy veya dosya hatası olabilir. Lütfen Supabase Storage ayarlarınızı kontrol edin.'
-            );
-            return;
-          }
-          // 4. Supabase Edge Function çağır (Eğer kullanıyorsanız)
-          const FUNCTION_URL =
-            'https://wablvevlywlqifnezzdp.supabase.co/functions/v1/x3p-compare';
-          // 4. Supabase Edge Function çağır
-          const res = await fetch(FUNCTION_URL, {
-            method: 'POST',
-            body: JSON.stringify({
-              url1: signed1.signedUrl,
-              url2: signed2.signedUrl,
-            }),
-            headers: {
-              'Content-Type': 'application/json',
-            },
-          });
-
-          const json = await res.json();
-          document.getElementById('output').textContent = JSON.stringify(
-            json,
-            null,
-            2
-          );
 
           // 5. Replit Function çağır (Ana mantık buradaysa)
           const DEEP_FUNCTION_URL =
@@ -646,8 +603,8 @@
           const deep_res = await fetch(DEEP_FUNCTION_URL, {
             method: 'POST',
             body: JSON.stringify({
-              url1: signed1.signedUrl,
-              url2: signed2.signedUrl,
+              url1: URL1,
+              url2: URL2,
             }),
             headers: {
               'Content-Type': 'application/json',
